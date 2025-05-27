@@ -1,0 +1,24 @@
+{
+  "name": "secp256k1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/defiveninth/secp256k1.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/defiveninth/secp256k1/issues"
+  },
+  "homepage": "https://github.com/defiveninth/secp256k1#readme",
+  "description": "",
+  "dependencies": {
+    "bls-signatures": "^2.0.3",
+    "elliptic": "^6.6.1",
+    "tweetnacl": "^1.0.3"
+  }
+}
