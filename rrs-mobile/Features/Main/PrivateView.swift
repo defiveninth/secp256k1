@@ -26,40 +26,6 @@ struct PrivateView: View {
     }
 }
 
-struct HomeView: View {
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Text("Home page")
-            }
-            .navigationTitle("Home")
-        }
-    }
-}
-
-struct HistoryView: View {
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Text("History")
-            }
-            .navigationTitle("History")
-        }
-    }
-}
-
-struct ProfileView: View {
-    var body: some View {
-        NavigationStack {
-            VStack {
-                Text("User Profile")
-                    .font(.title)
-            }
-                .navigationTitle("Profile")
-        }
-    }
-}
-
 #Preview {
     PrivateView()
 }
