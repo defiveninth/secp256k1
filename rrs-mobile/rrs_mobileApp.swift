@@ -11,7 +11,7 @@ import SwiftUI
 struct rrs_mobileApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PrivateView()
         }
     }
 }
