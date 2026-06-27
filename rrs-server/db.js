@@ -19,6 +19,18 @@ db.exec(`
     otp TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS restaurants (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    openTime TEXT,
+    closeTime TEXT,
+    location TEXT,
+    photoUrl TEXT,
+    contactPhoneNumber TEXT
+  );
+
 `);
 
 module.exports = db;
