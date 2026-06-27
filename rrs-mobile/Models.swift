@@ -22,4 +22,8 @@ struct Reservation: Identifiable, Codable {
     let guests: Int
 }
 
-
+enum AuthStep {
+    case enterEmail
+    case verifyPassword
+    case createAccount
+}

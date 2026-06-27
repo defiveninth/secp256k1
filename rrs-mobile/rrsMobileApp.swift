@@ -25,6 +25,9 @@ class AuthManager {
     var token: String? = nil
     var showLoginSheet: Bool = false
     
+    var currentStep: AuthStep = .enterEmail
+    var checkedEmail: String = ""
+    
     init() {
         if let savedToken = UserDefaults.standard.string(forKey: "authtoken") {
             self.token = savedToken
@@ -32,16 +35,43 @@ class AuthManager {
         }
     }
     
-    func login(token: String) {
-        UserDefaults.standard.set(token, forKey: "authtoken")
-        self.token = token
+    func checkEmailStatus(_ email: String) async {
+        try? await Task.sleep(nanoseconds: 1_000_000_000)
+        
+        self.checkedEmail = email
+
+        if email.lowercased().contains("new") {
+            self.currentStep = .createAccount
+        } else {
+            self.currentStep = .verifyPassword
+        }
+    }
+
+    func login(password: String) {
+        let mockToken = "mocked_jwt_token_for_\(checkedEmail)"
+        UserDefaults.standard.set(mockToken, forKey: "authtoken")
+        self.token = mockToken
         self.isAuthenticated = true
-        self.showLoginSheet = false
+        resetFlow()
+    }
+    
+    func registerUser(fullName: String, password: String, otp: String) {
+        let mockToken = "mocked_new_user_token"
+        UserDefaults.standard.set(mockToken, forKey: "authtoken")
+        self.token = mockToken
+        self.isAuthenticated = true
+        resetFlow()
     }
     
     func logout() {
         UserDefaults.standard.removeObject(forKey: "authtoken")
         self.token = nil
         self.isAuthenticated = false
+    }
+    
+    func resetFlow() {
+        self.currentStep = .enterEmail
+        self.checkedEmail = ""
+        self.showLoginSheet = false
     }
 }

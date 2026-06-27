@@ -25,7 +25,3 @@ struct PrivateView: View {
         }
     }
 }
-
-#Preview {
-    PrivateView()
-}
