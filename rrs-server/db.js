@@ -52,6 +52,18 @@ db.exec(`
     photoUrl TEXT NOT NULL,
     FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS reservations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    restaurantId INTEGER NOT NULL,
+    time TEXT NOT NULL,
+    day TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
+  );
+
 `);
 
 module.exports = db;

@@ -1,6 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const db = require('../db');
+const { JWT_SECRET } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -72,8 +74,10 @@ router.post('/sign-up', (req, res) => {
       VALUES (?, ?, ?)
     `);
     
+    let userId;
     try {
-      insertStmt.run(email, hashedPassword, fullname);
+      const info = insertStmt.run(email, hashedPassword, fullname);
+      userId = info.lastInsertRowid;
     } catch (dbError) {
       if (dbError.code === 'SQLITE_CONSTRAINT_UNIQUE') {
         return res.status(400).json({ error: 'User with this email already exists' });
@@ -84,9 +88,18 @@ router.post('/sign-up', (req, res) => {
     // Clear the OTP
     db.prepare('DELETE FROM otps WHERE email = ?').run(email);
 
+    // Generate JWT token
+    const token = jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '7d' });
+
     return res.status(201).json({
       success: true,
-      message: 'User registered successfully'
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: userId,
+        email,
+        fullname
+      }
     });
   } catch (error) {
     console.error('Error in /sign-up:', error);
@@ -116,8 +129,12 @@ router.post('/sign-in', (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
     return res.json({
       success: true,
+      token,
       user: {
         id: user.id,
         email: user.email,
