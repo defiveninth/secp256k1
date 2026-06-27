@@ -7,7 +7,16 @@ const router = express.Router();
 router.get('/', (req, res) => {
   try {
     const restaurants = db.prepare('SELECT * FROM restaurants').all();
-    return res.json(restaurants);
+    const photos = db.prepare('SELECT * FROM restaurant_photos').all();
+
+    const restaurantsWithPhotos = restaurants.map(r => {
+      r.photos = photos
+        .filter(p => p.restaurantId === r.id)
+        .map(p => p.photoUrl);
+      return r;
+    });
+
+    return res.json(restaurantsWithPhotos);
   } catch (error) {
     console.error('Error fetching restaurants:', error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -24,6 +33,9 @@ router.get('/:id', (req, res) => {
     if (!restaurant) {
       return res.status(404).json({ error: 'Restaurant not found' });
     }
+
+    const photos = db.prepare('SELECT photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(id);
+    restaurant.photos = photos.map(p => p.photoUrl);
 
     return res.json(restaurant);
   } catch (error) {
