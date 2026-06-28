@@ -64,6 +64,18 @@ db.exec(`
     FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS menu (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    restaurantId INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT NOT NULL,
+    photoUrl TEXT,
+    price REAL NOT NULL,
+    FOREIGN KEY (restaurantId) REFERENCES restaurants(id) ON DELETE CASCADE
+  );
+
+
 `);
 
 module.exports = db;
