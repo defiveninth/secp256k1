@@ -10,9 +10,7 @@ router.get('/', (req, res) => {
     const photos = db.prepare('SELECT * FROM restaurant_photos').all();
 
     const restaurantsWithPhotos = restaurants.map(r => {
-      r.photos = photos
-        .filter(p => p.restaurantId === r.id)
-        .map(p => p.photoUrl);
+      r.photos = photos.filter(p => p.restaurantId === r.id);
       return r;
     });
 
@@ -35,8 +33,8 @@ router.get('/:id', (req, res) => {
     }
 
     // Fetch photos
-    const photos = db.prepare('SELECT photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(id);
-    restaurant.photos = photos.map(p => p.photoUrl);
+    const photos = db.prepare('SELECT id, restaurantId, photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(id);
+    restaurant.photos = photos;
 
     // Fetch menu
     const menuItems = db.prepare('SELECT * FROM menu WHERE restaurantId = ?').all(id);

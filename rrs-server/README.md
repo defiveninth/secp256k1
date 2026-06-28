@@ -40,7 +40,7 @@ GET http://localhost:3000/mock/init-restaurants
 The SQLite database file `database.sqlite` is automatically generated on startup and managed by `db.js`. It contains the following tables:
 
 *   **`users`**: Customer credentials and details.
-*   **`otps`**: Temporary validation OTPs mapped to email addresses (mocked to `123456`).
+*   **`otps`**: Temporary validation OTPs mapped to email addresses.
 *   **`restaurants`**: Restaurant details, location, and operating hours.
 *   **`restaurant_photos`**: 1-to-many relationship mapping multiple Unsplash photos to each restaurant.
 *   **`menu`**: 1-to-many mapping of dishes, drinks, and desserts per restaurant (including name, description, category, price, and photoUrl).
@@ -59,17 +59,16 @@ Checks if an email is registered.
     { "email": "test@example.com" }
     ```
 *   **Response (Exists)**: `{ "exists": true }`
-*   **Response (New User)**: Registers a mock OTP (`123456`) and returns:
+*   **Response (New User)**: Sends an OTP to the email and returns:
     ```json
     {
       "exists": false,
-      "message": "OTP sent to email (mock: 123456)",
-      "otp": "123456"
+      "message": "OTP sent to email"
     }
     ```
 
 #### `POST /auth/sign-up`
-Registers a new user profile using the mock OTP.
+Registers a new user profile using the OTP.
 *   **Request Body**:
     ```json
     {

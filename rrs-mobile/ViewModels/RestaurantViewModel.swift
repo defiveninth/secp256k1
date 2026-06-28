@@ -1,0 +1,49 @@
+//
+//  RestaurantViewModel.swift
+//  rrs-mobile
+//
+//  Created by Abdurrauf on 28.06.2026.
+//
+
+import Foundation
+import Combine
+
+@MainActor
+class RestaurantViewModel: ObservableObject {
+    @Published var restaurants: [Restaurant] = []
+    @Published var selectedRestaurant: Restaurant? = nil
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String? = nil
+    
+    private let baseURL = NetworkManager.shared.baseURL
+    
+    func fetchRestaurants() async {
+        isLoading = true
+        errorMessage = nil
+        guard let url = URL(string: "\(baseURL)/restaurants") else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            self.restaurants = try JSONDecoder().decode([Restaurant].self, from: data)
+            isLoading = false
+        } catch {
+            isLoading = false
+            self.errorMessage = "Failed to load restaurants. Did you initialize the mock data?"
+        }
+    }
+
+    func fetchRestaurantDetails(id: Int) async {
+        isLoading = true
+        errorMessage = nil
+        guard let url = URL(string: "\(baseURL)/restaurants/\(id)") else { return }
+        
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            self.selectedRestaurant = try JSONDecoder().decode(Restaurant.self, from: data)
+            isLoading = false
+        } catch {
+            isLoading = false
+            self.errorMessage = "Failed to load restaurant menu profile."
+        }
+    }
+}

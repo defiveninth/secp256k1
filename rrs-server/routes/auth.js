@@ -36,8 +36,7 @@ router.post('/check', (req, res) => {
 
     return res.json({
       exists: false,
-      message: 'OTP sent to email (mock: 123456)',
-      otp: otp // Returning mock OTP for easy verification
+      message: 'OTP sent to email'
     });
   } catch (error) {
     console.error('Error in /check:', error);
