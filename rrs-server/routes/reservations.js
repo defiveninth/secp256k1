@@ -189,7 +189,7 @@ router.get('/', authenticateToken, (req, res) => {
     const reservationsWithDetails = reservations.map(r => {
       r.restaurantPhotos = photos
         .filter(p => p.restaurantId === r.restaurantId)
-        .map(p => p.photoUrl);
+        .map(p => p.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${p.photoUrl}` : p.photoUrl);
       r.preOrderList = JSON.parse(r.preOrderList || '{}');
       return r;
     });
@@ -226,7 +226,7 @@ router.get('/:id', authenticateToken, (req, res) => {
     }
 
     const photos = db.prepare('SELECT photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(reservation.restaurantId);
-    reservation.restaurantPhotos = photos.map(p => p.photoUrl);
+    reservation.restaurantPhotos = photos.map(p => p.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${p.photoUrl}` : p.photoUrl);
     reservation.preOrderList = JSON.parse(reservation.preOrderList || '{}');
 
     return res.json(reservation);

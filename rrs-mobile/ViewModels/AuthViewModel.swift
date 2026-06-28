@@ -14,15 +14,17 @@ class AuthViewModel: ObservableObject {
     @Published var otp: String = ""
     @Published var password: String = ""
     @Published var fullname: String = ""
-    
     @Published var isChecking: Bool = false
     @Published var errorMessage: String? = nil
-    
     @Published var showSignIn: Bool = false
     @Published var showSignUp: Bool = false
     @Published var isAuthenticated: Bool = false
     
     private let networkManager = NetworkManager.shared
+    
+    init() {
+        self.isAuthenticated = UserDefaults.standard.string(forKey: "authToken") != nil
+    }
     
     func checkEmail() async {
         guard !email.isEmpty else { return }
@@ -92,8 +94,9 @@ class AuthViewModel: ObservableObject {
             let result = try JSONDecoder().decode(LoginResponse.self, from: data)
                 
             if result.success, let sessionToken = result.token {
-            // Local key storage persistence wrapper
                 UserDefaults.standard.set(sessionToken, forKey: "authToken")
+                UserDefaults.standard.set(result.user?.fullname, forKey: "userFullName")
+                UserDefaults.standard.set(result.user?.email, forKey: "userEmail")
                 self.isAuthenticated = true
             } else {
                 self.errorMessage = "Failed validation checks. Check inputs."

@@ -130,8 +130,10 @@ struct CheckEmailView: View {
                 SignUpView(viewModel: viewModel)
             }
             .fullScreenCover(isPresented: $viewModel.isAuthenticated) {
-                MainTabView()
+                MainTabView(isAuthenticated: $viewModel.isAuthenticated)
             }
+
+
         }
     }
 }

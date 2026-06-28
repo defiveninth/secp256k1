@@ -10,7 +10,15 @@ router.get('/', (req, res) => {
     const photos = db.prepare('SELECT * FROM restaurant_photos').all();
 
     const restaurantsWithPhotos = restaurants.map(r => {
-      r.photos = photos.filter(p => p.restaurantId === r.id);
+      r.photos = photos
+        .filter(p => p.restaurantId === r.id)
+        .map(p => {
+          return {
+            id: p.id,
+            restaurantId: p.restaurantId,
+            photoUrl: p.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${p.photoUrl}` : p.photoUrl
+          };
+        });
       return r;
     });
 
@@ -34,11 +42,22 @@ router.get('/:id', (req, res) => {
 
     // Fetch photos
     const photos = db.prepare('SELECT id, restaurantId, photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(id);
-    restaurant.photos = photos;
+    restaurant.photos = photos.map(p => {
+      return {
+        id: p.id,
+        restaurantId: p.restaurantId,
+        photoUrl: p.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${p.photoUrl}` : p.photoUrl
+      };
+    });
 
     // Fetch menu
     const menuItems = db.prepare('SELECT * FROM menu WHERE restaurantId = ?').all(id);
-    restaurant.menu = menuItems;
+    restaurant.menu = menuItems.map(item => {
+      return {
+        ...item,
+        photoUrl: item.photoUrl && item.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${item.photoUrl}` : item.photoUrl
+      };
+    });
 
     return res.json(restaurant);
   } catch (error) {
@@ -59,7 +78,13 @@ router.get('/:id/menu', (req, res) => {
     }
 
     const menuItems = db.prepare('SELECT * FROM menu WHERE restaurantId = ?').all(id);
-    return res.json(menuItems);
+    const formattedMenuItems = menuItems.map(item => {
+      return {
+        ...item,
+        photoUrl: item.photoUrl && item.photoUrl.startsWith('/') ? `${req.protocol}://${req.get('host')}${item.photoUrl}` : item.photoUrl
+      };
+    });
+    return res.json(formattedMenuItems);
   } catch (error) {
     console.error(`Error fetching menu for restaurant ${id}:`, error);
     return res.status(500).json({ error: 'Internal server error' });
