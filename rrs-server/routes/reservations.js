@@ -72,9 +72,31 @@ function isTimeWithinOperatingHours(resTimeStr, openTimeStr, closeTimeStr) {
   }
 }
 
+// Helper to validate preOrderList format ({ itemId: count })
+function validatePreOrderList(preOrderList) {
+  if (preOrderList === undefined) {
+    return { valid: true, valueStr: '{}' };
+  }
+  if (typeof preOrderList !== 'object' || preOrderList === null || Array.isArray(preOrderList)) {
+    return { valid: false, error: 'preOrderList must be a JSON object of { itemId: count }' };
+  }
+  
+  // Verify each key/value is numeric/integer and count is positive
+  const sanitized = {};
+  for (const [key, val] of Object.entries(preOrderList)) {
+    const itemId = parseInt(key, 10);
+    const count = parseInt(val, 10);
+    if (isNaN(itemId) || isNaN(count) || count <= 0) {
+      return { valid: false, error: 'preOrderList keys must be numeric item IDs and values must be positive integers' };
+    }
+    sanitized[itemId] = count;
+  }
+  return { valid: true, valueStr: JSON.stringify(sanitized) };
+}
+
 // 1. POST /reservations - Create reservation
 router.post('/', authenticateToken, (req, res) => {
-  const { restaurantId, time, day } = req.body;
+  const { restaurantId, time, day, preOrderList } = req.body;
   const userId = req.user.id;
 
   if (!restaurantId || !time || !day) {
@@ -92,6 +114,13 @@ router.post('/', authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'Time must be a strict 30-minute slot (e.g. 10:00, 10:30, 11:00) in 24h format' });
   }
 
+  // Validate preOrderList
+  const preOrderValidation = validatePreOrderList(preOrderList);
+  if (!preOrderValidation.valid) {
+    return res.status(400).json({ error: preOrderValidation.error });
+  }
+  const preOrderListStr = preOrderValidation.valueStr;
+
   try {
     // Check if restaurant exists and fetch its operating hours
     const restaurant = db.prepare('SELECT * FROM restaurants WHERE id = ?').get(restaurantId);
@@ -107,7 +136,7 @@ router.post('/', authenticateToken, (req, res) => {
       });
     }
 
-    // Optional: check if duplicate reservation exists for this user at this slot
+    // Check if duplicate reservation exists for this user at this slot
     const duplicate = db.prepare(`
       SELECT id FROM reservations 
       WHERE userId = ? AND restaurantId = ? AND time = ? AND day = ?
@@ -118,10 +147,10 @@ router.post('/', authenticateToken, (req, res) => {
     }
 
     const insertStmt = db.prepare(`
-      INSERT INTO reservations (userId, restaurantId, time, day)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO reservations (userId, restaurantId, time, day, preOrderList)
+      VALUES (?, ?, ?, ?, ?)
     `);
-    const info = insertStmt.run(userId, restaurantId, normalizedTime, day);
+    const info = insertStmt.run(userId, restaurantId, normalizedTime, day, preOrderListStr);
 
     return res.status(201).json({
       success: true,
@@ -130,7 +159,8 @@ router.post('/', authenticateToken, (req, res) => {
         userId,
         restaurantId,
         time: normalizedTime,
-        day
+        day,
+        preOrderList: JSON.parse(preOrderListStr)
       }
     });
   } catch (error) {
@@ -145,7 +175,7 @@ router.get('/', authenticateToken, (req, res) => {
 
   try {
     const reservations = db.prepare(`
-      SELECT r.id, r.userId, r.restaurantId, r.time, r.day, r.created_at,
+      SELECT r.id, r.userId, r.restaurantId, r.time, r.day, r.preOrderList, r.created_at,
              rest.name AS restaurantName, rest.location AS restaurantLocation
       FROM reservations r
       JOIN restaurants rest ON r.restaurantId = rest.id
@@ -160,6 +190,7 @@ router.get('/', authenticateToken, (req, res) => {
       r.restaurantPhotos = photos
         .filter(p => p.restaurantId === r.restaurantId)
         .map(p => p.photoUrl);
+      r.preOrderList = JSON.parse(r.preOrderList || '{}');
       return r;
     });
 
@@ -177,7 +208,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 
   try {
     const reservation = db.prepare(`
-      SELECT r.id, r.userId, r.restaurantId, r.time, r.day, r.created_at,
+      SELECT r.id, r.userId, r.restaurantId, r.time, r.day, r.preOrderList, r.created_at,
              rest.name AS restaurantName, rest.location AS restaurantLocation,
              rest.openTime, rest.closeTime, rest.contactPhoneNumber
       FROM reservations r
@@ -196,6 +227,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 
     const photos = db.prepare('SELECT photoUrl FROM restaurant_photos WHERE restaurantId = ?').all(reservation.restaurantId);
     reservation.restaurantPhotos = photos.map(p => p.photoUrl);
+    reservation.preOrderList = JSON.parse(reservation.preOrderList || '{}');
 
     return res.json(reservation);
   } catch (error) {
@@ -207,7 +239,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 // 4. PUT /reservations/:id - Update reservation
 router.put('/:id', authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { time, day } = req.body;
+  const { time, day, preOrderList } = req.body;
   const userId = req.user.id;
 
   if (!time || !day) {
@@ -224,6 +256,13 @@ router.put('/:id', authenticateToken, (req, res) => {
   if (!normalizedTime || !isValidTimeSlot(normalizedTime)) {
     return res.status(400).json({ error: 'Time must be a strict 30-minute slot (e.g. 10:00, 10:30, 11:00) in 24h format' });
   }
+
+  // Validate preOrderList
+  const preOrderValidation = validatePreOrderList(preOrderList);
+  if (!preOrderValidation.valid) {
+    return res.status(400).json({ error: preOrderValidation.error });
+  }
+  const preOrderListStr = preOrderValidation.valueStr;
 
   try {
     // Fetch reservation to verify existence and ownership
@@ -253,9 +292,9 @@ router.put('/:id', authenticateToken, (req, res) => {
     // Update
     db.prepare(`
       UPDATE reservations 
-      SET time = ?, day = ? 
+      SET time = ?, day = ?, preOrderList = ? 
       WHERE id = ?
-    `).run(normalizedTime, day, id);
+    `).run(normalizedTime, day, preOrderListStr, id);
 
     return res.json({
       success: true,
@@ -265,7 +304,8 @@ router.put('/:id', authenticateToken, (req, res) => {
         userId,
         restaurantId: reservation.restaurantId,
         time: normalizedTime,
-        day
+        day,
+        preOrderList: JSON.parse(preOrderListStr)
       }
     });
   } catch (error) {
