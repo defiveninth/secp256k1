@@ -14,6 +14,18 @@ class RestaurantViewModel: ObservableObject {
     @Published var selectedRestaurant: Restaurant? = nil
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    @Published var searchText: String = ""
+    
+    var filteredRestaurants: [Restaurant] {
+        if searchText.isEmpty {
+            return restaurants
+        } else {
+            return restaurants.filter { restaurant in
+                restaurant.name.localizedStandardContains(searchText)
+                || restaurant.location.localizedStandardContains(searchText)
+            }
+        }
+    }
     
     private let baseURL = NetworkManager.shared.baseURL
     

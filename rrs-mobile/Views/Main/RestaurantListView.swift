@@ -50,7 +50,7 @@ struct RestaurantListView: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 24) {
-                            ForEach(vm.restaurants) { restaurant in
+                            ForEach(vm.filteredRestaurants) { restaurant in
                                 NavigationLink(destination: RestaurantDetailView(restaurantId: restaurant.id)) {
                                     VStack(alignment: .leading, spacing: 14) {
                                         if let firstPhoto = restaurant.photos?.first?.photoUrl, let url = URL(string: firstPhoto) {
@@ -113,6 +113,7 @@ struct RestaurantListView: View {
             }
         }
         .navigationTitle("Discover")
+        .searchable(text: $vm.searchText, prompt: "Search restaurants or locations...")
         .task {
             await vm.fetchRestaurants()
         }
