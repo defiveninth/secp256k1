@@ -1,10 +1,3 @@
-//
-//  RestaurantListView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct RestaurantListView: View {
@@ -28,7 +21,7 @@ struct RestaurantListView: View {
                     VStack(spacing: 16) {
                         Text("Info")
                             .font(.system(size: 18, weight: .medium, design: .serif))
-                        Text(error)
+                        Text(LocalizedStringKey(error))
                             .font(.system(size: 13, weight: .light))
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -81,12 +74,15 @@ struct RestaurantListView: View {
                                                     .font(.system(size: 10))
                                                     .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
                                                 
-                                                Text(restaurant.isAlwaysOpen
-                                                     ? "OPEN 24/7"
-                                                     : "\(restaurant.openTime ?? "") - \(restaurant.closeTime ?? "")"
-                                                )
-                                                .font(.system(size: 11, weight: .light))
-                                                .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
+                                                if restaurant.isAlwaysOpen {
+                                                    Text("OPEN 24/7")
+                                                        .font(.system(size: 11, weight: .light))
+                                                        .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
+                                                } else {
+                                                    Text("\(restaurant.openTime ?? "") - \(restaurant.closeTime ?? "")")
+                                                        .font(.system(size: 11, weight: .light))
+                                                        .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
+                                                }
                                             }
                                             .padding(.top, 2)
                                         }

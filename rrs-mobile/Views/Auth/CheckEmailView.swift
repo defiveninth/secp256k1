@@ -1,10 +1,3 @@
-//
-//  CheckEmailView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct CheckEmailView: View {
@@ -81,12 +74,12 @@ struct CheckEmailView: View {
                                     Image(systemName: "info.circle")
                                         .foregroundColor(.red)
                                         .font(.caption)
-                                    Text(error)
+                                    Text(LocalizedStringKey(error))
                                         .font(.caption)
                                         .foregroundColor(.red)
                                 }
                                 .padding(.horizontal, 4)
-                            }
+                             }
                         }
                         .padding(.horizontal, 28)
                         
@@ -132,8 +125,6 @@ struct CheckEmailView: View {
             .fullScreenCover(isPresented: $viewModel.isAuthenticated) {
                 MainTabView(isAuthenticated: $viewModel.isAuthenticated)
             }
-
-
         }
     }
 }

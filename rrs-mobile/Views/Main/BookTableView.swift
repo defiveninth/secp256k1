@@ -1,10 +1,3 @@
-//
-//  BookTableView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct BookTableView: View {
@@ -170,7 +163,7 @@ struct BookTableView: View {
                                 Image(systemName: "info.circle")
                                     .foregroundColor(.red)
                                     .font(.caption)
-                                Text(error)
+                                Text(LocalizedStringKey(error))
                                     .font(.caption)
                                     .foregroundColor(.red)
                             }
@@ -236,7 +229,7 @@ struct BookTableView: View {
                     dismiss()
                 }
             } message: {
-                Text("Your reservation at \(restaurant.name) has been booked successfully.")
+                Text(String(format: NSLocalizedString("Your reservation at %@ has been booked successfully.", comment: ""), restaurant.name))
             }
         }
     }

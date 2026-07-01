@@ -1,10 +1,3 @@
-//
-//  RestaurantDetailView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct RestaurantDetailView: View {
@@ -50,13 +43,17 @@ struct RestaurantDetailView: View {
                                 .tracking(1.5)
                             
                             HStack {
-                                Text(restaurant.isAlwaysOpen
-                                     ? "OPEN 24/7"
-                                     : "🕒 OPERATING HOURS: \(restaurant.openTime ?? "") - \(restaurant.closeTime ?? "")"
-                                )
-                                .font(.system(size: 10, weight: .bold))
-                                .tracking(1.0)
-                                .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+                                if restaurant.isAlwaysOpen {
+                                    Text("OPEN 24/7")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .tracking(1.0)
+                                        .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+                                } else {
+                                    Text(String(format: NSLocalizedString("🕒 OPERATING HOURS: %@ - %@", comment: ""), restaurant.openTime ?? "", restaurant.closeTime ?? ""))
+                                        .font(.system(size: 10, weight: .bold))
+                                        .tracking(1.0)
+                                        .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
+                                }
                                 Spacer()
                             }
                             .padding()
@@ -112,7 +109,7 @@ struct RestaurantDetailView: View {
                                                     .lineLimit(2)
                                             }
                                             
-                                            Text(item.category.uppercased())
+                                            Text(LocalizedStringKey(item.category.uppercased()))
                                                 .font(.system(size: 8, weight: .bold))
                                                 .tracking(1.0)
                                                 .padding(.horizontal, 6)

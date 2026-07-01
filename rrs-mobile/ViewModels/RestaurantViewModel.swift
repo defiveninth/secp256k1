@@ -1,10 +1,3 @@
-//
-//  RestaurantViewModel.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import Foundation
 import Combine
 
@@ -40,7 +33,7 @@ class RestaurantViewModel: ObservableObject {
             isLoading = false
         } catch {
             isLoading = false
-            self.errorMessage = "Failed to load restaurants. Did you initialize the mock data?"
+            self.errorMessage = NSLocalizedString("Failed to load restaurants. Did you initialize the mock data?", comment: "")
         }
     }
 
@@ -55,7 +48,7 @@ class RestaurantViewModel: ObservableObject {
             isLoading = false
         } catch {
             isLoading = false
-            self.errorMessage = "Failed to load restaurant menu profile."
+            self.errorMessage = NSLocalizedString("Failed to load restaurant menu profile.", comment: "")
         }
     }
 }

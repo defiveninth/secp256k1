@@ -1,10 +1,3 @@
-//
-//  Restaurant.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import Foundation
 
 struct Restaurant: Codable, Identifiable {

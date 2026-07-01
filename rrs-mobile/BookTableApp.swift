@@ -1,17 +1,13 @@
-//
-//  BookTable.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 @main
 struct BookTableApp: App {
+    @AppStorage("appLanguage") private var appLanguage: String = "en"
+    
     var body: some Scene {
         WindowGroup {
             CheckEmailView()
+                .environment(\.locale, .init(identifier: appLanguage))
         }
     }
 }

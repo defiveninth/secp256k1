@@ -1,10 +1,3 @@
-//
-//  AuthViewModel.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import Foundation
 import Combine
 
@@ -51,7 +44,7 @@ class AuthViewModel: ObservableObject {
             }
         } catch {
             isChecking = false
-            errorMessage = "Server down. Verify your node instance is listening on Port 3000."
+            errorMessage = NSLocalizedString("Server down. Verify your node instance is listening on Port 3000.", comment: "")
         }
     }
     
@@ -99,10 +92,10 @@ class AuthViewModel: ObservableObject {
                 UserDefaults.standard.set(result.user?.email, forKey: "userEmail")
                 self.isAuthenticated = true
             } else {
-                self.errorMessage = "Failed validation checks. Check inputs."
+                self.errorMessage = NSLocalizedString("Failed validation checks. Check inputs.", comment: "")
             }
         } catch {
-            self.errorMessage = "Request failure. Verify schema structure details syntax."
+            self.errorMessage = NSLocalizedString("Request failure. Verify schema structure details syntax.", comment: "")
         }
     }
 }

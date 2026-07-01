@@ -1,10 +1,3 @@
-//
-//  ReservationViewModel.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import Foundation
 import Combine
 
@@ -34,11 +27,11 @@ class ReservationViewModel: ObservableObject {
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                 self.reservations = try JSONDecoder().decode([Reservation].self, from: data)
             } else {
-                self.errorMessage = "Failed to load reservations."
+                self.errorMessage = NSLocalizedString("Failed to load reservations.", comment: "")
             }
             isLoading = false
         } catch {
-            self.errorMessage = "Network error. Failed to load reservations."
+            self.errorMessage = NSLocalizedString("Network error. Failed to load reservations.", comment: "")
             isLoading = false
         }
     }
@@ -65,7 +58,7 @@ class ReservationViewModel: ObservableObject {
         ]
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else {
-            self.errorMessage = "Failed to serialize booking request."
+            self.errorMessage = NSLocalizedString("Failed to serialize booking request.", comment: "")
             isLoading = false
             return false
         }
@@ -83,14 +76,14 @@ class ReservationViewModel: ObservableObject {
                        let errorMsg = errorObj["error"] as? String {
                         self.errorMessage = errorMsg
                     } else {
-                        self.errorMessage = "Failed to complete reservation."
+                        self.errorMessage = NSLocalizedString("Failed to complete reservation.", comment: "")
                     }
                 }
             }
             isLoading = false
             return false
         } catch {
-            self.errorMessage = "Network error. Failed to make reservation."
+            self.errorMessage = NSLocalizedString("Network error. Failed to make reservation.", comment: "")
             isLoading = false
             return false
         }
@@ -113,11 +106,11 @@ class ReservationViewModel: ObservableObject {
             if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
                 self.reservations.removeAll { $0.id == id }
             } else {
-                self.errorMessage = "Failed to cancel reservation."
+                self.errorMessage = NSLocalizedString("Failed to cancel reservation.", comment: "")
             }
             isLoading = false
         } catch {
-            self.errorMessage = "Network error. Failed to cancel reservation."
+            self.errorMessage = NSLocalizedString("Network error. Failed to cancel reservation.", comment: "")
             isLoading = false
         }
     }

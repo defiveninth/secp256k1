@@ -1,17 +1,21 @@
-//
-//  MainTabView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct MainTabView: View {
     @Binding var isAuthenticated: Bool
     
+    @AppStorage("appLanguage") private var appLanguage: String = "en"
+    @State private var showLanguagePicker = false
+    
     @State private var userFullName: String = UserDefaults.standard.string(forKey: "userFullName") ?? "Guest User"
     @State private var userEmail: String = UserDefaults.standard.string(forKey: "userEmail") ?? "guest@example.com"
+    
+    private var currentLanguageName: String {
+        switch appLanguage {
+        case "ru": return "Русский"
+        case "kk": return "Қазақша"
+        default: return "English"
+        }
+    }
     
     var body: some View {
         TabView {
@@ -44,16 +48,29 @@ struct MainTabView: View {
                                     .reduce("") { $0 + ($1.first.map(String.init) ?? "") }
                                     .prefix(2)
                                 
-                                Text(initials.isEmpty ? "GU" : initials)
-                                    .font(.system(size: 28, weight: .light, design: .serif))
-                                    .foregroundColor(Color(red: 0.08, green: 0.08, blue: 0.08))
-                                    .frame(width: 80, height: 80)
-                                    .background(Color(white: 0.97))
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color(white: 0.9), lineWidth: 1)
-                                    )
+                                if initials.isEmpty {
+                                    Text("GU")
+                                        .font(.system(size: 28, weight: .light, design: .serif))
+                                        .foregroundColor(Color(red: 0.08, green: 0.08, blue: 0.08))
+                                        .frame(width: 80, height: 80)
+                                        .background(Color(white: 0.97))
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color(white: 0.9), lineWidth: 1)
+                                        )
+                                } else {
+                                    Text(initials)
+                                        .font(.system(size: 28, weight: .light, design: .serif))
+                                        .foregroundColor(Color(red: 0.08, green: 0.08, blue: 0.08))
+                                        .frame(width: 80, height: 80)
+                                        .background(Color(white: 0.97))
+                                        .clipShape(Circle())
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color(white: 0.9), lineWidth: 1)
+                                        )
+                                }
                                 
                                 VStack(spacing: 6) {
                                     Text(userFullName)
@@ -78,7 +95,10 @@ struct MainTabView: View {
                                     Divider()
                                     ProfileRow(title: "Notifications", value: "Enabled")
                                     Divider()
-                                    ProfileRow(title: "Language", value: "English")
+                                    ProfileRow(title: "Language", value: currentLanguageName)
+                                        .onTapGesture {
+                                            showLanguagePicker = true
+                                        }
                                 }
                                 .background(Color.white)
                                 .cornerRadius(8)
@@ -138,6 +158,12 @@ struct MainTabView: View {
                     userFullName = UserDefaults.standard.string(forKey: "userFullName") ?? "Guest User"
                     userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "guest@example.com"
                 }
+                .confirmationDialog("Change Language", isPresented: $showLanguagePicker, titleVisibility: .visible) {
+                    Button("English") { appLanguage = "en" }
+                    Button("Русский") { appLanguage = "ru" }
+                    Button("Қазақша") { appLanguage = "kk" }
+                    Button("Cancel", role: .cancel) {}
+                }
             }
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")
@@ -153,14 +179,14 @@ struct ProfileRow: View {
     
     var body: some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.system(size: 14, weight: .light))
                 .foregroundColor(Color(red: 0.15, green: 0.15, blue: 0.15))
             
             Spacer()
             
             if !value.isEmpty {
-                Text(value)
+                Text(LocalizedStringKey(value))
                     .font(.system(size: 13, weight: .light))
                     .foregroundColor(.secondary)
             }

@@ -1,10 +1,3 @@
-//
-//  ReservationHistoryView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 import CoreImage
 
@@ -115,7 +108,7 @@ struct ReservationHistoryView: View {
                                                 .foregroundColor(.secondary)
                                                 .tracking(1.0)
                                             
-                                            Text(reservation.preOrderList.map { "Dish #\($0.key) (x\($0.value))" }.joined(separator: ", "))
+                                            Text(reservation.preOrderList.map { String(format: NSLocalizedString("Dish #%@ (x%d)", comment: ""), $0.key, $0.value) }.joined(separator: ", "))
                                                 .font(.system(size: 12, weight: .light))
                                                 .foregroundColor(Color(red: 0.3, green: 0.3, blue: 0.3))
                                         }

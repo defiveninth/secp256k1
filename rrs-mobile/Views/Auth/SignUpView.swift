@@ -1,10 +1,3 @@
-//
-//  SignUpView.swift
-//  rrs-mobile
-//
-//  Created by Abdurrauf on 28.06.2026.
-//
-
 import SwiftUI
 
 struct SignUpView: View {
@@ -120,7 +113,7 @@ struct SignUpView: View {
                                 Image(systemName: "info.circle")
                                     .foregroundColor(.red)
                                     .font(.caption)
-                                Text(error)
+                                Text(LocalizedStringKey(error))
                                     .font(.caption)
                                     .foregroundColor(.red)
                             }
